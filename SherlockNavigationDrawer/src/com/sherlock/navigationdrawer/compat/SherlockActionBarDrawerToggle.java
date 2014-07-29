@@ -128,6 +128,51 @@ public class SherlockActionBarDrawerToggle implements DrawerLayout.DrawerListene
     private final int mCloseDrawerContentDescRes;
 
     private Object mSetIndicatorInfo;
+    
+    private float mSliderOffset = 0.0f;
+    
+    /**
+     * 
+     * We want to be able to configure slider offset for custom drawer images
+     * So we wrote a new constructor and setter for that, and changed logic to integrate it
+     * 
+     * @param activity
+     * @param drawerLayout
+     * @param drawerImageRes
+     * @param openDrawerContentDescRes
+     * @param closeDrawerContentDescRes
+     * @param sliderOffset
+     */
+    public SherlockActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout,
+            int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes, float sliderOffset) {
+    	mActivity = activity;
+        mDrawerLayout = drawerLayout;
+        mDrawerImageResource = drawerImageRes;
+        mOpenDrawerContentDescRes = openDrawerContentDescRes;
+        mCloseDrawerContentDescRes = closeDrawerContentDescRes;
+
+        mThemeImage = IMPL.getThemeUpIndicator(activity);
+        mDrawerImage = activity.getResources().getDrawable(drawerImageRes);
+        mSlider = new SlideDrawable(mDrawerImage);
+
+        mSliderOffset = sliderOffset;
+        
+        mSlider.setOffsetBy(getSliderOffset());
+    }
+    
+    public void setSliderOffset(float sliderOffset){
+    	if(mSliderOffset!=sliderOffset){
+    		boolean setItAfterwards = (mSlider.getOffset()==getSliderOffset());
+    		mSliderOffset = sliderOffset;
+    		if(setItAfterwards){
+    			mSlider.setOffsetBy(getSliderOffset());
+    		}
+    	}
+    }
+    
+    private float getSliderOffset(){
+    	return (0.f==mSliderOffset?1.f/3.f:mSliderOffset);
+    }
 
     /**
      * Construct a new ActionBarDrawerToggle.
@@ -150,16 +195,7 @@ public class SherlockActionBarDrawerToggle implements DrawerLayout.DrawerListene
      */
     public SherlockActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout,
             int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
-        mActivity = activity;
-        mDrawerLayout = drawerLayout;
-        mDrawerImageResource = drawerImageRes;
-        mOpenDrawerContentDescRes = openDrawerContentDescRes;
-        mCloseDrawerContentDescRes = closeDrawerContentDescRes;
-
-        mThemeImage = IMPL.getThemeUpIndicator(activity);
-        mDrawerImage = activity.getResources().getDrawable(drawerImageRes);
-        mSlider = new SlideDrawable(mDrawerImage);
-        mSlider.setOffsetBy(1.f / 3);
+        this(activity,drawerLayout,drawerImageRes,openDrawerContentDescRes,closeDrawerContentDescRes,0.f);
     }
 
     /**
